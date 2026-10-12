@@ -130,7 +130,11 @@ The old version only ran in Claude Code. Distilly now supports native local Skil
 
 **Grok Bot preview:** Grok Bot supports saved/private Skills, but its official docs do not describe direct local `SKILL.md` imports. Distilly's workflow can be migrated manually into a saved Skill; direct repo installation is not yet verified.
 
-### 4️⃣ Personal agents
+Each generated Person Profile is packaged as an Agent Skill and can be installed into any supported host.
+
+---
+
+## 🤖 Personal Agents
 
 Distilly also targets the personal agents people now live with. Each one keeps its own memory and connected accounts, so a Person Profile is meant to carry over into them instead of starting from zero.
 
@@ -143,8 +147,6 @@ Distilly also targets the personal agents people now live with. Each one keeps i
 <td align="center" width="20%"><a href="https://github.com/NousResearch/hermes-agent"><img src="docs/assets/hosts/hermes-agent-wordmark.png" alt="Hermes Agent" height="32"></a><br><sub>native Skill</sub></td>
 </tr>
 </table>
-
-Each generated Person Profile is packaged as an Agent Skill and can be installed into any supported host.
 
 ---
 
