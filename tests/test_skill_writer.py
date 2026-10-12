@@ -342,7 +342,7 @@ class SkillWriterTest(unittest.TestCase):
                 saved_meta["engine"]["research_profile_bundle"].values(),
             )
             self.assertIn(
-                "references/celebrity_budget_unfriendly_framework.md",
+                "prompts/celebrity/budget_unfriendly/framework.md",
                 saved_meta["engine"]["research_profile_references"],
             )
             self.assertEqual(manifest["research_profile"], "budget-unfriendly")

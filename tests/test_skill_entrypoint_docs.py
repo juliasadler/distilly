@@ -42,7 +42,7 @@ README_INVOCATION_PATTERNS = (
     re.compile(r"(?<![\w.-])/skill:\{character\}-\{slug\}"),
 )
 HAN_CHARACTER = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
-BUNDLED_PATH = re.compile(r"\b((?:prompts|references|tools)/[\w./-]+\.(?:md|py|sh))\b")
+BUNDLED_PATH = re.compile(r"\b((?:prompts|tools)/[\w./-]+\.(?:md|py|sh))\b")
 BARE_TOOL_CALL = re.compile(r"(?:python3|bash) \"?tools/")
 RESEARCH_FLOOR = re.compile(r"`([A-Z][\w -]+?) (?:>=|=) \d+`")
 
@@ -50,7 +50,6 @@ RESEARCH_FLOOR = re.compile(r"`([A-Z][\w -]+?) (?:>=|=) \d+`")
 def _instruction_files() -> dict[str, str]:
     """Everything the agent may read while running the Skill: the router plus prompts."""
     paths = [ROOT / "SKILL.md", *sorted((ROOT / "prompts").rglob("*.md"))]
-    paths.extend(sorted((ROOT / "references").rglob("*.md")))
     return {path.relative_to(ROOT).as_posix(): path.read_text(encoding="utf-8") for path in paths}
 
 
@@ -269,7 +268,7 @@ class SkillEntrypointDocsTest(unittest.TestCase):
             ROOT / "INSTALL_EN.md",
             ROOT / "prompts" / "celebrity" / "research.md",
             ROOT / "prompts" / "celebrity" / "budget_unfriendly" / "research.md",
-            ROOT / "references" / "celebrity_budget_unfriendly_framework.md",
+            ROOT / "prompts" / "celebrity" / "budget_unfriendly" / "framework.md",
             ROOT / ".github" / "PULL_REQUEST_TEMPLATE.md",
         ]
         single_language_paths.extend(
@@ -303,11 +302,6 @@ class SkillEntrypointDocsTest(unittest.TestCase):
             self.assertIsNone(
                 HAN_CHARACTER.search(prompt_path.read_text(encoding="utf-8")),
                 f"Chinese copy remains in {prompt_path.relative_to(ROOT)}",
-            )
-        for reference_path in sorted((ROOT / "references").rglob("*.md")):
-            self.assertIsNone(
-                HAN_CHARACTER.search(reference_path.read_text(encoding="utf-8")),
-                f"Chinese copy remains in {reference_path.relative_to(ROOT)}",
             )
 
         for name in ("README_JA.md", "ROADMAP_JA.md"):

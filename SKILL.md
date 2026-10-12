@@ -117,7 +117,7 @@ Default to `budget-friendly`. Only switch to `budget-unfriendly` when the user e
 
 Choose the intake prompt by character family:
 
-- `colleague` → `prompts/intake.md`
+- `colleague` → `prompts/colleague/intake.md`
 - `relationship` → `prompts/relationship/intake.md`
 - `celebrity` → `prompts/celebrity/intake.md`
 
@@ -384,14 +384,14 @@ First resolve the execution matrix for the selected character family:
 
 | character | intake | persona analyzer | persona builder | merger | storage root |
 |-----------|--------|------------------|-----------------|--------|--------------|
-| `colleague` | `prompts/intake.md` | `prompts/persona_analyzer.md` | `prompts/persona_builder.md` | `prompts/merger.md` | `./skills/colleague/{slug}` |
+| `colleague` | `prompts/colleague/intake.md` | `prompts/colleague/persona_analyzer.md` | `prompts/colleague/persona_builder.md` | `prompts/colleague/merger.md` | `./skills/colleague/{slug}` |
 | `relationship` | `prompts/relationship/intake.md` | `prompts/relationship/persona_analyzer.md` | `prompts/relationship/persona_builder.md` | `prompts/relationship/merger.md` | `./skills/relationship/{slug}` |
 | `celebrity` | `prompts/celebrity/intake.md` | `prompts/celebrity/persona_analyzer.md` | `prompts/celebrity/persona_builder.md` | `prompts/celebrity/merger.md` | `./skills/celebrity/{slug}` |
 
 Shared across all families:
-- Work analyzer: `prompts/work_analyzer.md`
-- Work builder: `prompts/work_builder.md`
-- Correction handler: `prompts/correction_handler.md`
+- Work analyzer: `prompts/shared/work_analyzer.md`
+- Work builder: `prompts/shared/work_builder.md`
+- Correction handler: `prompts/shared/correction_handler.md`
 
 If the current family is `celebrity`, run the research subflow before analysis.
 
@@ -474,7 +474,7 @@ Read `XQUIK_API_KEY` only from the shell; never print or store it. Treat the JSO
 
 1. First read:
    - `prompts/celebrity/budget_unfriendly/research.md`
-   - `references/celebrity_budget_unfriendly_framework.md`
+   - `prompts/celebrity/budget_unfriendly/framework.md`
 2. Create the research directories first:
    ```bash
    mkdir -p "{skill_dir}/knowledge/research/raw" "{skill_dir}/knowledge/research/merged" "{skill_dir}/knowledge/research/reviews"
@@ -507,7 +507,7 @@ Read `XQUIK_API_KEY` only from the shell; never print or store it. Treat the JSO
 9. Then read:
    - `prompts/celebrity/budget_unfriendly/audit.md`
    - `prompts/celebrity/budget_unfriendly/synthesis.md`
-   - `references/celebrity_budget_unfriendly_template.md`
+   - `prompts/celebrity/budget_unfriendly/template.md`
 10. First write `knowledge/research/reviews/research_audit.md`
     - The audit must produce an explicit `PASS / FAIL`
     - The audit must verify: source hierarchy compliance (no blacklisted sources), primary-source ratio > 50%, taste principle compliance, cold figure assessment
@@ -546,7 +546,7 @@ Shared rules for both celebrity profiles:
 Once the family is resolved, analyze along two tracks:
 
 **Track A (Work Skill)**:
-- Refer to `prompts/work_analyzer.md`
+- Refer to `prompts/shared/work_analyzer.md`
 - Extract: responsible systems, technical standards, workflow, output preferences, experience
 - For `celebrity`, interpret `work` as methods, judgment frameworks, and decision patterns rather than literal job scope
 
@@ -565,11 +565,11 @@ Once the family is resolved, analyze along two tracks:
 
 ### Step 4: Generate and Preview
 
-Use `prompts/work_builder.md` to generate Work content.
+Use `prompts/shared/work_builder.md` to generate Work content.
 Use the family-specific persona builder to generate Persona content.
 
 Mapping:
-- `colleague` → `prompts/persona_builder.md`
+- `colleague` → `prompts/colleague/persona_builder.md`
 - `relationship` → `prompts/relationship/persona_builder.md`
 - `celebrity` → `prompts/celebrity/persona_builder.md`
 - `celebrity` + `budget-unfriendly` → `prompts/celebrity/budget_unfriendly/persona_builder.md`
@@ -715,7 +715,7 @@ When user provides new files or text:
 
 When user expresses "that's wrong" / "he should be":
 
-1. Refer to `prompts/correction_handler.md` to identify correction content
+1. Refer to `prompts/shared/correction_handler.md` to identify correction content
 2. Determine if it belongs to Work (technical/workflow) or Persona (personality/communication)
 3. If it belongs to Work:
    - Generate `/tmp/distilly_{slug}_work_patch.md`
