@@ -10,7 +10,7 @@
 
 </div>
 
-> 이 페이지는 요약본입니다. 전체 최신 문서는 **[영어 README](../../README.md)**를 참고하세요.
+> 이 페이지는 요약본입니다. 전체 최신 문서: **[영어 README](../../README.md)**
 
 ## Distilly가 하는 일
 
@@ -34,7 +34,7 @@ git clone https://github.com/titanwings/distilly <DISTILLY_SKILL_DIR>
 
 ## 사용법
 
-에이전트에게 *"Distilly로 `<인물>`의 Person Profile을 만들어 줘."*라고 말하세요. 내 프로필은 *"Distilly로 내 프로필을 설정해 줘."*
+에이전트에게 이렇게 말하세요: *"Distilly로 `<인물>`의 Person Profile을 만들어 줘."* 내 프로필은: *"Distilly로 내 프로필을 설정해 줘."*
 
 ## 더 보기 (영어)
 
