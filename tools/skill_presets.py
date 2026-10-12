@@ -128,7 +128,7 @@ CHARACTER_PRESETS = {
                 "display_name": "Budget Unfriendly",
                 "description": "Deep six-track research with evidence grading, synthesis review, and stricter validation.",
                 "prompt_bundle": {
-                    "research": "prompts/celebrity/budget_unfriendly/research.md",
+                    "research": "prompts/celebrity/research.md",
                     "audit": "prompts/celebrity/budget_unfriendly/audit.md",
                     "synthesis": "prompts/celebrity/budget_unfriendly/synthesis.md",
                     "validation": "prompts/celebrity/budget_unfriendly/validation.md",

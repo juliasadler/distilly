@@ -65,7 +65,7 @@ Runs before Step 3 analysis in `prompts/flows/create.md` when the family is `cel
 ## celebrity / budget-unfriendly
 
 1. First read:
-   - `prompts/celebrity/budget_unfriendly/research.md`
+   - `prompts/celebrity/research.md` (the budget-unfriendly output contract)
    - `prompts/celebrity/budget_unfriendly/framework.md`
 2. Create the research directories first:
    ```bash
@@ -79,7 +79,7 @@ Runs before Step 3 analysis in `prompts/flows/create.md` when the family is `cel
    - `knowledge/research/raw/04_decisions.md` (Dim 4: Behavior and choices)
    - `knowledge/research/raw/05_external_views.md` (Dim 5: External views and criticism)
    - `knowledge/research/raw/06_timeline.md` (Dim 6: Cognitive trajectory)
-5. Follow the taste principles, source blacklist and source hierarchy in `prompts/celebrity/budget_unfriendly/research.md`. Every evidence item must carry a source weight (1-7) annotation.
+5. Follow the taste principles, source blacklist and source hierarchy in `prompts/celebrity/research.md`. Every evidence item must carry a source weight (1-7) annotation.
 6. Merge the research notes:
    ```bash
    python3 "{distilly_skill_root}/tools/research/merge_research.py" "{skill_dir}"

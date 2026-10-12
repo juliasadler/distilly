@@ -275,7 +275,6 @@ class SkillEntrypointDocsTest(unittest.TestCase):
             ROOT / "CITATION.cff",
             ROOT / "INSTALL_EN.md",
             ROOT / "prompts" / "celebrity" / "research.md",
-            ROOT / "prompts" / "celebrity" / "budget_unfriendly" / "research.md",
             ROOT / "prompts" / "celebrity" / "budget_unfriendly" / "framework.md",
             ROOT / ".github" / "PULL_REQUEST_TEMPLATE.md",
         ]
