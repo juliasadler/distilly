@@ -20,8 +20,14 @@ def default_destination(host: str, home: Path | None = None) -> Path:
 
 
 def payload_entries(source: Path) -> list[str]:
-    """Return the files a Distilly install ships: package.json "files" minus the npm CLI."""
-    files = json.loads((source / "package.json").read_text(encoding="utf-8"))["files"]
+    """Return the files a Distilly install ships: package.json "files" minus the npm CLI.
+
+    An installed copy has no package.json because it already is the payload, so it is copied whole.
+    """
+    package_json = source / "package.json"
+    if not package_json.exists():
+        return sorted(path.name for path in source.iterdir() if not IGNORE_NAMES(str(source), [path.name]))
+    files = json.loads(package_json.read_text(encoding="utf-8"))["files"]
     return [entry.rstrip("/") for entry in files if entry.rstrip("/") != "bin"]
 
 

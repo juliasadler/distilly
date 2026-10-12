@@ -49,6 +49,19 @@ class DistillyInstallTest(unittest.TestCase):
             )
             self.assertTrue((destination / "prompts" / "intake.md").exists())
 
+    def test_installed_copy_without_package_json_reinstalls_whole(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            source = Path(tmp_dir) / "installed" / "distilly"
+            destination = Path(tmp_dir) / "other" / "distilly"
+            (source / "tools" / "__pycache__").mkdir(parents=True)
+            (source / "SKILL.md").write_text("name: distilly\n", encoding="utf-8")
+            (source / "tools" / "hosts.json").write_text("{}", encoding="utf-8")
+
+            install_skill(source, destination)
+            self.assertTrue((destination / "SKILL.md").exists())
+            self.assertTrue((destination / "tools" / "hosts.json").exists())
+            self.assertFalse((destination / "tools" / "__pycache__").exists())
+
     def test_install_skill_refuses_incomplete_payload_without_touching_destination(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             source = Path(tmp_dir) / "source"
