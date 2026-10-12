@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/social-preview-distilly-v7.png" alt="Distilly — Distill how they think into Person Profiles for Agents" width="100%">
+<img src="docs/social-preview-distilly-v10.png" alt="Distilly — Distill how they think into Person Profiles for Agents" width="100%">
 
 <br>
 
@@ -131,6 +131,22 @@ The old version only ran in Claude Code. Distilly now supports native local Skil
 **Grok Bot preview:** Grok Bot supports saved/private Skills, but its official docs do not describe direct local `SKILL.md` imports. Distilly's workflow can be migrated manually into a saved Skill; direct repo installation is not yet verified.
 
 Each generated Person Profile is packaged as an Agent Skill and can be installed into any supported host.
+
+---
+
+## 🤖 Personal Agents
+
+Distilly also targets the personal agents people now live with. Each one keeps its own memory and connected accounts, so a Person Profile is meant to carry over into them instead of starting from zero.
+
+<table>
+<tr>
+<td align="center" width="20%"><a href="https://x.ai"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/assets/hosts/grok-build-mark-dark.png"><img src="docs/assets/hosts/grok-build-mark-light.png" alt="Grok Bot" height="46"></picture></a><br><b>Grok Bot</b><br><sub>saved Skill · preview</sub></td>
+<td align="center" width="20%"><a href="https://www.meta.ai"><img src="docs/assets/hosts/meta-mark.svg" alt="Meta Muse" height="40"></a><br><b>Meta Muse</b><br><sub>profile handoff · planned</sub></td>
+<td align="center" width="20%"><a href="https://openai.com"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/assets/hosts/openai-mark-dark.svg"><img src="docs/assets/hosts/openai-mark-light.svg" alt="OpenAI Dots" height="40"></picture></a><br><b>OpenAI Dots</b><br><sub>profile handoff · planned</sub></td>
+<td align="center" width="20%"><a href="https://github.com/openclaw/openclaw"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/assets/hosts/openclaw-wordmark-dark.svg"><img src="docs/assets/hosts/openclaw-wordmark-light.svg" alt="OpenClaw" height="38"></picture></a><br><sub>native Skill</sub></td>
+<td align="center" width="20%"><a href="https://github.com/NousResearch/hermes-agent"><img src="docs/assets/hosts/hermes-agent-wordmark.png" alt="Hermes Agent" height="32"></a><br><sub>native Skill</sub></td>
+</tr>
+</table>
 
 ---
 
