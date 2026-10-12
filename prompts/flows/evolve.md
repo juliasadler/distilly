@@ -9,7 +9,7 @@ When user provides new files or text:
 1. Read new content with `prompts/flows/sources.md`
 2. Resolve the base dir for the current family
 3. `Read` existing `{resolved_base_dir}/{slug}/work.md` and `persona.md`
-4. Use the family's merger prompt (matrix in `prompts/flows/create.md`) for incremental analysis
+4. Use `prompts/{character}/merger.md` for incremental analysis
 5. Archive current version (Bash):
    ```bash
    python3 "{distilly_skill_root}/tools/version_manager.py" \

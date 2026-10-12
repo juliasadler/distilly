@@ -4,7 +4,7 @@ Runs before Step 3 analysis in `prompts/flows/create.md` when the family is `cel
 
 ## celebrity / budget-friendly
 
-1. Read `prompts/celebrity/research.md` and follow its **6-dimension parallel collection strategy**
+1. Read `prompts/celebrity/research.md`: follow the shared sections and the **Output Contract: budget-friendly**; skip the budget-unfriendly contract
 2. Create the research directories first:
    ```bash
    mkdir -p "{skill_dir}/knowledge/research/raw" "{skill_dir}/knowledge/research/merged"
@@ -65,7 +65,7 @@ Runs before Step 3 analysis in `prompts/flows/create.md` when the family is `cel
 ## celebrity / budget-unfriendly
 
 1. First read:
-   - `prompts/celebrity/research.md` (the budget-unfriendly output contract)
+   - `prompts/celebrity/research.md`: the shared sections and the **Output Contract: budget-unfriendly**; skip the budget-friendly contract
    - `prompts/celebrity/budget_unfriendly/framework.md`
 2. Create the research directories first:
    ```bash

@@ -6,8 +6,6 @@ The flow for `colleague`, `relationship` and `celebrity`. Resolve every `prompts
 
 Every step below reads its prompt from this table.
 
-First resolve the execution matrix for the selected character family:
-
 | character | intake | persona analyzer | persona builder | merger | storage root |
 |-----------|--------|------------------|-----------------|--------|--------------|
 | `colleague` | `prompts/colleague/intake.md` | `prompts/colleague/persona_analyzer.md` | `prompts/colleague/persona_builder.md` | `prompts/colleague/merger.md` | `./skills/colleague/{slug}` |
@@ -38,7 +36,6 @@ If the current family is `celebrity`, also confirm the research profile:
 2. `budget-unfriendly`
 
 Default to `budget-friendly`. Only switch to `budget-unfriendly` when the user explicitly wants deeper research, higher confidence, or accepts a slower and more expensive distillation pass.
-
 
 ## Step 1: Basic Info Collection
 
@@ -74,12 +71,10 @@ Then analyze along two tracks:
   - contradictions
   - honest boundaries
 
-
 ## Step 4: Generate and Preview
 
 Use `prompts/shared/work_builder.md` to generate Work content.
-Use the family-specific persona builder to generate Persona content.
-Use the family's persona builder from the matrix; `celebrity` + `budget-unfriendly` uses `prompts/celebrity/budget_unfriendly/persona_builder.md`.
+Use the family's persona builder from the matrix to generate Persona content; `celebrity` + `budget-unfriendly` uses `prompts/celebrity/budget_unfriendly/persona_builder.md`.
 
 Show the user a summary (5-8 lines each), ask:
 ```
@@ -97,7 +92,6 @@ Persona Summary:
 
 Confirm generation? Or need adjustments?
 ```
-
 
 ## Step 5: Write Files
 

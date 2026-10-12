@@ -95,7 +95,7 @@ Grounded URLs must be actual inspected pages, not platform roots or placeholder 
 
 ### Tooling for non-subtitled audio and video
 
-Long interviews and podcasts without subtitles are often the richest source of Conversations and Expression DNA — do not skip them. Use the Whisper transcription tool:
+Long interviews and podcasts without subtitles are often the richest source of Conversations and Expression DNA — do not skip them. Use the Whisper transcription tool (faster-whisper, openai-whisper or the OpenAI API, whichever is available):
 
 - `tools/research/transcribe_audio.py --url "<URL>" --output /tmp/x.txt`
 - Local file: `--input /path/to/file.mp3 --output /tmp/x.txt`
@@ -423,7 +423,7 @@ Before moving on, make sure the notes support:
 
 ## Copyright Safety
 
-- Do not write full transcripts or subtitle dumps into the skill directory
+- Do not write full transcripts, subtitle dumps, transcript-like blocks or long copied dialogue into the skill directory
 - Do not paste long excerpts from books, subtitles, interviews, or articles
 - Keep any direct quote very short (under 2 sentences) and sparse, only when essential for capturing expression DNA
 - Summarize in your own words with source metadata and attribution

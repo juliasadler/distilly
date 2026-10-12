@@ -38,4 +38,4 @@ The create flow pulls in `prompts/flows/sources.md` for importing material and, 
 
 ## Compatible hosts
 
-Claude Code, OpenClaw, Hermes, Codex, DeepSeek Harness, Pi coding agent, Grok Build and OpenCode. Invoke with `/distilly` in Claude Code, Hermes, DeepSeek Harness and Grok Build; `/distilly` or `/skill distilly` in OpenClaw; `$distilly` or `/skills` in Codex; `/skill:distilly` in Pi. OpenCode loads Skills natively and has no dedicated command. Grok Bot cannot import this directory directly; see `INSTALL_EN.md`.
+Claude Code, OpenClaw, Hermes, Codex, DeepSeek Harness, Pi coding agent, Grok Build and OpenCode. Invoke with `/distilly` in Claude Code, Hermes, DeepSeek Harness and Grok Build; `/distilly` or `/skill distilly` in OpenClaw; `$distilly` or `/skills` in Codex; `/skill:distilly` in Pi. OpenCode loads Skills natively and has no dedicated command. Grok Bot cannot import this directory directly; do not present this repository as a Grok Bot install.
