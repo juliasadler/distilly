@@ -11,7 +11,7 @@ allowed-tools: Read, Write, Edit, Bash
 
 > **Skill Root**: Before reading a bundled prompt or running a bundled script, resolve the absolute directory of the `SKILL.md` that the host actually loaded. In the instructions below, `{distilly_skill_root}` means that exact directory. Claude Code exposes it as `${CLAUDE_SKILL_DIR}`; on every other host, use the loaded-skill path supplied by that host's discovery context. Do not assume the shell's current working directory is the Skill root, and do not guess or hard-code an install path. If the host does not expose the loaded path or more than one Distilly installation is ambiguous, ask the user to identify the active installation before running code.
 >
-> Keep the shell in the user's current workspace so relative output paths such as `./skills/...` remain project-local. Resolve every `tools/...` and `prompts/...` resource against `{distilly_skill_root}`. For example, execute the bundled `tools/example.py` as `python3 "{distilly_skill_root}/tools/example.py"`; replace the placeholder with the resolved absolute path in the actual tool call.
+> Keep the shell in the user's current workspace so relative output paths such as `./skills/...` remain project-local. Resolve every `tools/...` and `prompts/...` resource against `{distilly_skill_root}`. For example, run `tools/owner_profile.py` as `python3 "{distilly_skill_root}/tools/owner_profile.py"`; replace the placeholder with the resolved absolute path in the actual tool call.
 
 # Distilly Creator
 
