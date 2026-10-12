@@ -44,6 +44,7 @@ README_INVOCATION_PATTERNS = (
 HAN_CHARACTER = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
 BUNDLED_PATH = re.compile(r"\b((?:prompts|tools)/[\w./-]+\.(?:md|py|sh))\b")
 BARE_TOOL_CALL = re.compile(r"(?:python3|bash) \"?tools/")
+ROUTER_MAX_LINES = 80
 RESEARCH_FLOOR = re.compile(r"`([A-Z][\w -]+?) (?:>=|=) \d+`")
 
 
@@ -115,6 +116,13 @@ class SkillEntrypointDocsTest(unittest.TestCase):
         # Bundled resources resolve against the loaded Skill, never the shell cwd.
         self.assertIn("{distilly_skill_root}", content)
         self.assertIn("${CLAUDE_SKILL_DIR}", content)
+
+    def test_router_stays_short_and_routes_every_flow(self) -> None:
+        router = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        # Hosts load SKILL.md in full on every trigger; flow detail loads on demand.
+        self.assertLessEqual(len(router.splitlines()), ROUTER_MAX_LINES)
+        for flow in sorted((ROOT / "prompts" / "flows").glob("*.md")):
+            self.assertIn(flow.relative_to(ROOT).as_posix(), router, f"router never reaches {flow.name}")
 
     def test_instruction_files_reference_existing_resources(self) -> None:
         for path, content in _instruction_files().items():
