@@ -24,6 +24,8 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from distilly.core import paths
+
 
 BEGIN_MARKER = "<!-- distilly:owner-profile:begin -->"
 END_MARKER = "<!-- distilly:owner-profile:end -->"
@@ -49,13 +51,7 @@ def owner_home() -> Path:
 
 def openclaw_workspace() -> Path:
     """Resolve the OpenClaw workspace the same way OpenClaw does."""
-    override = os.environ.get("OPENCLAW_WORKSPACE_DIR")
-    if override:
-        return Path(override).expanduser()
-    profile = os.environ.get("OPENCLAW_PROFILE")
-    if profile and profile != "default":
-        return Path.home() / f".openclaw-{profile}" / "workspace"
-    return Path.home() / ".openclaw" / "workspace"
+    return paths.openclaw_workspace(Path.home())
 
 
 HOST_USER_FILES = {

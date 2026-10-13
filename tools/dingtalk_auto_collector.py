@@ -34,7 +34,6 @@ import json
 import sys
 import time
 import argparse
-import platform
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Optional
@@ -47,10 +46,11 @@ except ImportError:
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import credentials  # noqa: E402
+from distilly.core import config as config_file  # noqa: E402
+from distilly.core.chrome import default_chrome_profile  # noqa: E402
 
 
-CONFIG_PATH = Path.home() / ".distilly" / "dingtalk_config.json"
-LEGACY_CONFIG_PATH = Path.home() / ".colleague-skill" / "dingtalk_config.json"
+CONFIG_PATH, LEGACY_CONFIG_PATH = config_file.config_paths("dingtalk")
 API_BASE = "https://api.dingtalk.com"
 
 
@@ -58,16 +58,11 @@ API_BASE = "https://api.dingtalk.com"
 
 def load_config() -> dict:
     """读取配置文件原始内容；文件不存在时返回空 dict（凭证可能全部来自环境变量或钥匙串）"""
-    config_path = CONFIG_PATH if CONFIG_PATH.exists() else LEGACY_CONFIG_PATH
-    if not config_path.exists():
-        return {}
-    return json.loads(config_path.read_text(encoding="utf-8"))
+    return config_file.load_config(CONFIG_PATH, LEGACY_CONFIG_PATH)
 
 
 def save_config(config: dict) -> None:
-    CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
-    CONFIG_PATH.write_text(json.dumps(config, indent=2, ensure_ascii=False))
-    CONFIG_PATH.chmod(0o600)
+    config_file.save_config(CONFIG_PATH, config)
 
 
 def setup_config() -> None:
@@ -492,16 +487,7 @@ def collect_bitables(user: dict, config: dict) -> str:
 
 # ─── 消息记录（浏览器方案）────────────────────────────────────────────────────
 
-def get_default_chrome_profile() -> str:
-    system = platform.system()
-    if system == "Darwin":
-        return str(Path.home() / "Library/Application Support/Google/Chrome/Default")
-    elif system == "Linux":
-        return str(Path.home() / ".config/google-chrome/Default")
-    elif system == "Windows":
-        import os
-        return str(Path(os.environ.get("LOCALAPPDATA", "")) / "Google/Chrome/User Data/Default")
-    return str(Path.home() / ".config/google-chrome/Default")
+get_default_chrome_profile = default_chrome_profile
 
 
 def collect_messages_browser(

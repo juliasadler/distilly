@@ -26,22 +26,13 @@ from __future__ import annotations
 import sys
 import time
 import argparse
-import platform
 from pathlib import Path
 from typing import Optional
 
+from distilly.core.chrome import default_chrome_profile
 
-def get_default_chrome_profile() -> str:
-    """根据操作系统返回 Chrome 默认 Profile 路径"""
-    system = platform.system()
-    if system == "Darwin":
-        return str(Path.home() / "Library/Application Support/Google/Chrome/Default")
-    elif system == "Linux":
-        return str(Path.home() / ".config/google-chrome/Default")
-    elif system == "Windows":
-        import os
-        return str(Path(os.environ.get("LOCALAPPDATA", "")) / "Google/Chrome/User Data/Default")
-    return str(Path.home() / ".config/google-chrome/Default")
+
+get_default_chrome_profile = default_chrome_profile
 
 
 def make_context(playwright, chrome_profile: Optional[str], headless: bool):

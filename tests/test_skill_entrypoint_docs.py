@@ -325,6 +325,10 @@ class SkillEntrypointDocsTest(unittest.TestCase):
         self.assertIn('"codex": { "skills_dir": [".agents", "skills"] }', host_table)
         self.assertIn('.distilly-install.json', generated_installer)
 
+        config_source = (ROOT / "tools" / "distilly" / "core" / "config.py").read_text(encoding="utf-8")
+        self.assertIn('Path.home() / ".distilly"', config_source)
+        self.assertIn('Path.home() / ".colleague-skill"', config_source)
+        self.assertIn("path.chmod(0o600)", config_source)
         for collector_name in (
             "feishu_auto_collector.py",
             "feishu_mcp_client.py",
@@ -332,9 +336,7 @@ class SkillEntrypointDocsTest(unittest.TestCase):
             "slack_auto_collector.py",
         ):
             collector = (ROOT / "tools" / collector_name).read_text(encoding="utf-8")
-            self.assertIn('Path.home() / ".distilly"', collector)
-            self.assertIn('Path.home() / ".colleague-skill"', collector)
-            self.assertIn("CONFIG_PATH.chmod(0o600)", collector)
+            self.assertIn("config_file.config_paths(", collector)
 
 
 if __name__ == "__main__":

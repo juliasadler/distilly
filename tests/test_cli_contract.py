@@ -3,7 +3,8 @@
 SKILL.md, prompts/flows and the install guides tell agents and users to run
 `python3 tools/<script>.py ...`, and tests import those scripts as modules.
 This test records, for each script, the options its --help lists and the
-public names it exposes, and fails when either changes. It runs the scripts
+public names it exposes. It fails when an option changes or a public name
+disappears. It runs the scripts
 both from the repository and from a freshly installed copy.
 
 After an intended change to a script's options or public names, regenerate
@@ -162,7 +163,9 @@ class CliContractTest(unittest.TestCase):
                     self.skipTest(f"optional dependency for {script} is not installed")
                 self.assertTrue((root / script).is_file(), f"{script} is missing")
                 self.assertEqual(describe_cli(root, script), expected["cli"])
-                self.assertEqual(describe_api(root, script), expected["api"])
+                # New public names are fine; removing or renaming one breaks importers.
+                missing = sorted(set(expected["api"]) - set(describe_api(root, script)))
+                self.assertEqual(missing, [], f"{script} no longer exposes these names")
 
     def test_every_script_is_in_the_snapshot(self) -> None:
         self.assertEqual(sorted(self.snapshot), script_paths())

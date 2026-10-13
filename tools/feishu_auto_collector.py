@@ -62,10 +62,10 @@ except ImportError:
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import credentials  # noqa: E402
+from distilly.core import config as config_file  # noqa: E402
 
 
-CONFIG_PATH = Path.home() / ".distilly" / "feishu_config.json"
-LEGACY_CONFIG_PATH = Path.home() / ".colleague-skill" / "feishu_config.json"
+CONFIG_PATH, LEGACY_CONFIG_PATH = config_file.config_paths("feishu")
 BASE_URL = "https://open.feishu.cn/open-apis"
 
 
@@ -73,16 +73,11 @@ BASE_URL = "https://open.feishu.cn/open-apis"
 
 def load_config() -> dict:
     """读取配置文件原始内容；文件不存在时返回空 dict（凭证可能全部来自环境变量或钥匙串）"""
-    config_path = CONFIG_PATH if CONFIG_PATH.exists() else LEGACY_CONFIG_PATH
-    if not config_path.exists():
-        return {}
-    return json.loads(config_path.read_text())
+    return config_file.load_config(CONFIG_PATH, LEGACY_CONFIG_PATH)
 
 
 def save_config(config: dict) -> None:
-    CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
-    CONFIG_PATH.write_text(json.dumps(config, indent=2, ensure_ascii=False))
-    CONFIG_PATH.chmod(0o600)
+    config_file.save_config(CONFIG_PATH, config)
 
 
 def setup_config() -> None:

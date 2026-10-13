@@ -46,26 +46,21 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import credentials  # noqa: E402
+from distilly.core import config as config_file  # noqa: E402
 
 
-CONFIG_PATH = Path.home() / ".distilly" / "feishu_config.json"
-LEGACY_CONFIG_PATH = Path.home() / ".colleague-skill" / "feishu_config.json"
+CONFIG_PATH, LEGACY_CONFIG_PATH = config_file.config_paths("feishu")
 
 
 # ─── 配置管理 ────────────────────────────────────────────────────────────────
 
 def load_config() -> dict:
-    if CONFIG_PATH.exists():
-        return json.loads(CONFIG_PATH.read_text())
-    if LEGACY_CONFIG_PATH.exists():
-        return json.loads(LEGACY_CONFIG_PATH.read_text())
-    return {}
+    """读取配置文件原始内容；文件不存在时返回空 dict（凭证可能全部来自环境变量或钥匙串）"""
+    return config_file.load_config(CONFIG_PATH, LEGACY_CONFIG_PATH)
 
 
 def save_config(config: dict) -> None:
-    CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
-    CONFIG_PATH.write_text(json.dumps(config, indent=2))
-    CONFIG_PATH.chmod(0o600)
+    config_file.save_config(CONFIG_PATH, config)
 
 
 def setup_config() -> None:

@@ -28,6 +28,8 @@ import re
 import sys
 from pathlib import Path
 
+from distilly.core import paths
+
 
 # Category hints. Matching is by whole tokens of a source name, so "x" matches
 # "x", "x-mcp" or "x_api" but not "xero". The list only seeds the agent's own
@@ -137,13 +139,7 @@ def home() -> Path:
 
 
 def openclaw_workspace() -> Path:
-    override = os.environ.get("OPENCLAW_WORKSPACE_DIR")
-    if override:
-        return Path(override).expanduser()
-    profile = os.environ.get("OPENCLAW_PROFILE")
-    if profile and profile != "default":
-        return home() / f".openclaw-{profile}" / "workspace"
-    return home() / ".openclaw" / "workspace"
+    return paths.openclaw_workspace(home())
 
 
 def user_files() -> list[tuple[str, Path]]:
