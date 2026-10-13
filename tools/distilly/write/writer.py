@@ -16,6 +16,8 @@ import sys
 from pathlib import Path
 from typing import Optional
 
+from distilly.core.hosts import generated_skills_dir
+from distilly.install import claude, generated
 from distilly.profile.presets import (
     get_character_preset,
     normalize_character,
@@ -37,79 +39,27 @@ from distilly.profile.schema import (
     validate_path_segment,
 )
 
-
-SKILL_MD_TEMPLATE_EN = """\
----
-name: {combined_name}
-description: {description}
-user-invocable: true
----
-
-# {display_name}
-
-{identity}
-
----
-
-## PART A: Work
-
-{work_content}
-
----
-
-## PART B: Persona
-
-{persona_content}
-
----
-
-## Operating Rules
-
-When any task or question arrives:
-
-1. **Start with PART B**: decide whether you would take the task and in what attitude.
-2. **Execute with PART A**: use the work methods, heuristics, and capability profile to do the task.
-3. **Keep PART B in the output**: preserve the tone, diction, rhythm, and reaction patterns from the persona.
-
-**Layer 0 rules in PART B always take priority and must never be violated.**
-"""
-
-
-SKILL_MD_TEMPLATE_ZH = """\
----
-name: {combined_name}
-description: {description}
-user-invocable: true
----
-
-# {display_name}
-
-{identity}
-
----
-
-## PART A：工作能力
-
-{work_content}
-
----
-
-## PART B：人物性格
-
-{persona_content}
-
----
-
-## 运行规则
-
-接收到任何任务或问题时：
-
-1. **先由 PART B 判断**：你会不会接这个任务？用什么态度接？
-2. **再由 PART A 执行**：用你的技术能力和工作方法完成任务
-3. **输出时保持 PART B 的表达风格**：你说话的方式、用词习惯、句式
-
-**PART B 的 Layer 0 规则永远优先，任何情况下不得违背。**
-"""
+# Rendering and patching moved to their own modules; names stay importable from
+# here for callers of tools/skill_writer.py.
+from distilly.write.patch import (  # noqa: F401
+    SECTION_HEADING_RE,
+    apply_correction,
+    merge_markdown_patch,
+    normalize_corrections,
+)
+from distilly.write.render import (  # noqa: F401
+    SKILL_MD_TEMPLATE_EN,
+    SKILL_MD_TEMPLATE_ZH,
+    WORK_ONLY_FALLBACK_EN,
+    WORK_ONLY_FALLBACK_ZH,
+    _PERSONA_HANDOFF_PATTERNS,
+    language_code,
+    prefers_chinese,
+    render_combined_skill,
+    render_persona_skill,
+    render_work_skill,
+    work_only_content,
+)
 
 
 MAX_SLUG_LENGTH = 40
@@ -139,103 +89,6 @@ def slugify(name: str) -> str:
         candidate = name
 
     return normalize_command_slug(candidate)
-
-
-def language_code(meta: dict) -> str:
-    """Return the preferred language code for rendered artifacts."""
-    return (
-        meta.get("language")
-        or meta.get("classification", {}).get("language")
-        or "en"
-    ).lower()
-
-
-def prefers_chinese(meta: dict) -> bool:
-    """Return whether artifact chrome should be rendered in Chinese."""
-    return language_code(meta).startswith("zh")
-
-
-def render_combined_skill(meta: dict, work_content: str, persona_content: str) -> str:
-    """Render the combined SKILL.md file from normalized metadata."""
-    artifacts = meta["artifacts"]
-    identity = build_identity_string(meta)
-    description = meta.get("summary") or (
-        f"{meta['display_name']}, {identity}" if identity else meta["display_name"]
-    )
-    template = SKILL_MD_TEMPLATE_ZH if prefers_chinese(meta) else SKILL_MD_TEMPLATE_EN
-
-    return template.format(
-        combined_name=artifacts["combined_name"],
-        description=description,
-        display_name=meta["display_name"],
-        identity=identity,
-        work_content=work_content,
-        persona_content=persona_content,
-    )
-
-
-_PERSONA_HANDOFF_PATTERNS = (
-    re.compile(r"如果被问到[^。\n]*职责范围[^。\n]*Persona[^。\n]*。\s*"),
-    re.compile(
-        r"If (?:you are )?asked (?:a question |about something )?outside (?:of )?(?:your|the) "
-        r"(?:recorded )?(?:scope of )?(?:your )?responsibilit(?:y|ies)[^.\n]*Persona[^.\n]*\.\s*",
-        re.IGNORECASE,
-    ),
-)
-
-WORK_ONLY_FALLBACK_ZH = (
-    "如果问题超出已记录的职责范围，或原材料不足以回答，请直接说明缺口。"
-    "不要臆造缺失信息，也不要引用 Persona。"
-)
-WORK_ONLY_FALLBACK_EN = (
-    "If the question is outside the recorded responsibilities or the source "
-    "material is insufficient, state the gap. Do not fabricate missing information "
-    "or refer to Persona."
-)
-
-
-def work_only_content(work_content: str, *, chinese: bool) -> str:
-    """Copy Work text for the Work-only skill, without a Persona handoff."""
-    text = work_content
-    for pattern in _PERSONA_HANDOFF_PATTERNS:
-        text = pattern.sub("", text)
-    text = text.rstrip()
-    fallback = WORK_ONLY_FALLBACK_ZH if chinese else WORK_ONLY_FALLBACK_EN
-    if fallback not in text:
-        text = f"{text}\n\n{fallback}" if text else fallback
-    return text
-
-
-def render_work_skill(meta: dict, work_content: str) -> str:
-    """Render the work-only skill artifact."""
-    artifacts = meta["artifacts"]
-    chinese = prefers_chinese(meta)
-    description = (
-        f"{meta['display_name']} 的工作能力（仅 Work，无 Persona）"
-        if chinese
-        else f"{meta['display_name']} work capability only (without persona)"
-    )
-    body = work_only_content(work_content, chinese=chinese)
-    return (
-        f"---\nname: {artifacts['work_name']}\n"
-        f"description: {description}\n"
-        f"user-invocable: true\n---\n\n{body}\n"
-    )
-
-
-def render_persona_skill(meta: dict, persona_content: str) -> str:
-    """Render the persona-only skill artifact."""
-    artifacts = meta["artifacts"]
-    description = (
-        f"{meta['display_name']} 的人物性格（仅 Persona，无工作能力）"
-        if prefers_chinese(meta)
-        else f"{meta['display_name']} persona only (without work capability)"
-    )
-    return (
-        f"---\nname: {artifacts['persona_name']}\n"
-        f"description: {description}\n"
-        f"user-invocable: true\n---\n\n{persona_content}\n"
-    )
 
 
 def write_artifacts(skill_dir: Path, meta: dict, work_content: str, persona_content: str) -> None:
@@ -309,86 +162,6 @@ def backup_current_artifacts(skill_dir: Path, version_name: str) -> None:
         src = skill_dir / filename
         if src.exists():
             shutil.copy2(src, version_dir / filename)
-
-
-SECTION_HEADING_RE = re.compile(r"^##\s+.+$", re.MULTILINE)
-
-
-def merge_markdown_patch(existing_content: str, patch_content: str) -> str:
-    """Replace matching level-2 markdown sections, otherwise append the patch."""
-    matches = list(SECTION_HEADING_RE.finditer(patch_content))
-    if not matches:
-        return existing_content + ("\n\n" if existing_content else "") + patch_content
-
-    merged = existing_content
-    replaced_any = False
-
-    for index, match in enumerate(matches):
-        heading = match.group(0)
-        start = match.start()
-        end = matches[index + 1].start() if index + 1 < len(matches) else len(patch_content)
-        patch_section = patch_content[start:end].strip()
-
-        section_match = re.search(rf"(?m)^{re.escape(heading)}\s*$", merged)
-        if not section_match:
-            merged = merged.rstrip() + "\n\n" + patch_section
-            continue
-
-        replaced_any = True
-        section_start = section_match.start()
-        next_section = re.search(r"(?m)^##\s+.+$", merged[section_match.end():])
-        section_end = (
-            section_match.end() + next_section.start()
-            if next_section
-            else len(merged)
-        )
-        merged = merged[:section_start].rstrip() + "\n\n" + patch_section + "\n\n" + merged[section_end:].lstrip()
-
-    if replaced_any:
-        return merged.strip() + "\n"
-    return merged
-
-
-def apply_correction(persona_content: str, correction: dict) -> str:
-    """Append a normalized correction entry to persona content."""
-    scene = correction.get("scene", "general")
-    correction_line = f"\n- [{scene}] should not {correction['wrong']}; should {correction['correct']}"
-    target = "## Correction Log"
-    legacy_target = "## Correction 记录"
-    if target in persona_content:
-        insert_pos = persona_content.index(target) + len(target)
-        rest = persona_content[insert_pos:]
-        placeholder = "\n\n(No entries yet)"
-        if rest.startswith(placeholder):
-            rest = rest[len(placeholder):]
-        return persona_content[:insert_pos] + correction_line + rest
-    if legacy_target in persona_content:
-        insert_pos = persona_content.index(legacy_target) + len(legacy_target)
-        rest = persona_content[insert_pos:]
-        legacy_placeholder = "\n\n（暂无记录）"
-        if rest.startswith(legacy_placeholder):
-            rest = rest[len(legacy_placeholder):]
-        return persona_content[:insert_pos] + correction_line + rest
-    return persona_content + f"\n\n## Correction Log\n{correction_line}\n"
-
-
-def normalize_corrections(correction: dict | list[dict] | None) -> list[dict]:
-    """Normalize a correction payload into a flat list of correction entries."""
-    if not correction:
-        return []
-
-    if isinstance(correction, list):
-        return [item for item in correction if isinstance(item, dict)]
-
-    if isinstance(correction, dict):
-        if {"wrong", "correct"} <= correction.keys():
-            return [correction]
-        for key in ("persona_corrections", "corrections"):
-            value = correction.get(key)
-            if isinstance(value, list):
-                return [item for item in value if isinstance(item, dict) and {"wrong", "correct"} <= item.keys()]
-
-    return []
 
 
 def update_skill(
@@ -481,6 +254,14 @@ def resolve_base_dir(base_dir_arg: str | None, character: str) -> Path:
     return resolve_storage_root(character, base_dir_arg)
 
 
+# Hosts other than Claude Code that create/update can install into, each with an
+# --install-<host>-skill flag and a --<host>-skills-dir override.
+EXTRA_GENERATED_HOSTS = (
+    ("openclaw", "OpenClaw", "trigger: /{command_name}"),
+    ("codex", "Codex", "skill name: {command_name}"),
+)
+
+
 def install_generated_hosts(
     skill_dir: Path,
     args: argparse.Namespace,
@@ -490,26 +271,19 @@ def install_generated_hosts(
     output_lines: list[str] = []
 
     if install_claude_skill:
-        from distilly.install.claude import (
-            default_claude_commands_dir,
-            default_claude_skills_dir,
-            install_generated_skill,
-            should_install_command_shim,
-        )
-
-        install_result = install_generated_skill(
+        install_result = claude.install_generated_skill(
             skill_dir,
             Path(args.claude_skills_dir).expanduser()
             if args.claude_skills_dir
-            else default_claude_skills_dir(),
+            else claude.default_claude_skills_dir(),
             commands_dir=(
                 Path(args.claude_commands_dir).expanduser()
                 if args.claude_commands_dir
-                else default_claude_commands_dir()
+                else claude.default_claude_commands_dir()
             ),
             force=True,
             install_command_shim=(
-                args.install_claude_command_shim or should_install_command_shim()
+                args.install_claude_command_shim or claude.should_install_command_shim()
             ),
         )
         output_lines.append(f"  Claude skill: {install_result['skill_dir']}")
@@ -517,35 +291,18 @@ def install_generated_hosts(
         if install_result["command_shim_installed"] and install_result["command_path"] is not None:
             output_lines.append(f"  Claude command shim: {install_result['command_path']}")
 
-    if args.install_openclaw_skill:
-        from distilly.core.hosts import generated_skills_dir
-        from distilly.install.generated import install_generated_skill
-
-        install_result = install_generated_skill(
+    for host, label, name_line in EXTRA_GENERATED_HOSTS:
+        if not getattr(args, f"install_{host}_skill"):
+            continue
+        override = getattr(args, f"{host}_skills_dir")
+        install_result = generated.install_generated_skill(
             skill_dir,
-            Path(args.openclaw_skills_dir).expanduser()
-            if args.openclaw_skills_dir
-            else generated_skills_dir("openclaw"),
+            Path(override).expanduser() if override else generated_skills_dir(host),
             force=True,
-            host="openclaw",
+            host=host,
         )
-        output_lines.append(f"  OpenClaw skill: {install_result['skill_dir']}")
-        output_lines.append(f"  OpenClaw trigger: /{install_result['command_name']}")
-
-    if args.install_codex_skill:
-        from distilly.core.hosts import generated_skills_dir
-        from distilly.install.generated import install_generated_skill
-
-        install_result = install_generated_skill(
-            skill_dir,
-            Path(args.codex_skills_dir).expanduser()
-            if args.codex_skills_dir
-            else generated_skills_dir("codex"),
-            force=True,
-            host="codex",
-        )
-        output_lines.append(f"  Codex skill: {install_result['skill_dir']}")
-        output_lines.append(f"  Codex skill name: {install_result['command_name']}")
+        output_lines.append(f"  {label} skill: {install_result['skill_dir']}")
+        output_lines.append(f"  {label} {name_line.format(**install_result)}")
 
     return output_lines
 
