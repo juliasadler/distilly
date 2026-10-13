@@ -5,6 +5,8 @@ on:
     branches: [dot-skill, main]
   pull_request:
     branches: [dot-skill, main]
+  # Lets a stacked PR, retargeted after its base merges, run CI without a new push.
+  workflow_dispatch:
 
 jobs:
   test:
