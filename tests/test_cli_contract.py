@@ -57,7 +57,7 @@ def script_paths() -> list[str]:
     """Every runnable Python script under tools/, as a repo-relative path."""
     paths = []
     for path in sorted(TOOLS_DIR.rglob("*.py")):
-        if "__pycache__" in path.parts:
+        if "__pycache__" in path.parts or "distilly" in path.relative_to(TOOLS_DIR).parts:
             continue
         if 'if __name__ == "__main__"' in path.read_text(encoding="utf-8"):
             paths.append(path.relative_to(REPO_ROOT).as_posix())
